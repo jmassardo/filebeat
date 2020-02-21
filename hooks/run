@@ -1,0 +1,20 @@
+# Delete and stop the service if it already exists.
+if (Get-Service filebeat -ErrorAction SilentlyContinue) {
+  $service = Get-WmiObject -Class Win32_Service -Filter "name='filebeat'"
+  $service.StopService()
+  Start-Sleep -s 1
+  $service.delete()
+}
+
+# Kill any filebeat processes
+if (Get-Process -ProcessName "filebeat" -ErrorAction SilentlyContinue) {
+  Stop-Process -ProcessName "filebeat"
+} 
+
+# Load up new hab managed process
+try {
+  $p = Start-Process {{pkg.path}}\bin\filebeat.exe -ArgumentList "-c `"{{pkg.svc_config_path}}\filebeat.yml`" -path.home `"{{pkg.svc_path}}`" -path.data `"{{pkg.svc_data_path}}`" -path.logs `"{{pkg.svc_data_path}}\logs`" -E logging.files.redirect_stderr=true" -PassThru # do not add -Wait arg
+  $p.WaitForExit()
+} finally {
+  if(!$p.HasExited) { $p.Kill() }
+}

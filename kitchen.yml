@@ -1,0 +1,33 @@
+---
+driver:
+  name: azurerm
+
+driver_config:
+  location: "Central US"
+  machine_size: "Standard_DS2_v2"
+
+verifier:
+  name: inspec
+
+provisioner:
+  name: habitat
+  hab_version: 'latest'
+  hab_license: accept
+
+platforms:
+  - name: windows
+    driver:
+      image_urn: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest
+      vm_name: filebeat
+    provisioner:
+      package_origin: jmassardo
+      package_name: filebeat
+      results_directory: results
+      install_latest_artifact: true
+      config_directory: configs
+
+suites:
+  - name: default
+    verifier:
+      inspec_tests:
+        - tests
