@@ -8,7 +8,7 @@ if (Get-Service filebeat -ErrorAction SilentlyContinue) {
 
 # Kill any filebeat processes
 if (Get-Process -ProcessName "filebeat" -ErrorAction SilentlyContinue) {
-  Stop-Process -ProcessName "filebeat"
+  Stop-Process -ProcessName "filebeat" -ErrorAction SilentlyContinue
 } 
 
 # Load up new hab managed process
